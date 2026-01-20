@@ -37,7 +37,7 @@
             color: #000;
             border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             display: flex;
             flex-direction: column;
             height: 500px;
@@ -49,10 +49,22 @@
             margin-bottom: 15px;
         }
 
-        .user { color: var(--user-color); font-weight: bold; margin: 5px 0; }
-        .bot { color: var(--bot-color); font-weight: bold; margin: 5px 0; }
+        .user {
+            color: var(--user-color);
+            font-weight: bold;
+            margin: 5px 0;
+        }
 
-        #input-container { display: flex; }
+        .bot {
+            color: var(--bot-color);
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        #input-container {
+            display: flex;
+        }
+
         #input {
             flex: 1;
             padding: 12px 15px;
@@ -73,11 +85,23 @@
             transition: background-color 0.3s;
         }
 
-        #send:hover { background-color: #777; }
+        #send:hover {
+            background-color: #777;
+        }
 
-        #chat::-webkit-scrollbar { width: 8px; }
-        #chat::-webkit-scrollbar-thumb { background-color: #bbb; border-radius: 4px; }
-        #chat::-webkit-scrollbar-track { background-color: #eee; border-radius: 4px; }
+        #chat::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #chat::-webkit-scrollbar-thumb {
+            background-color: #bbb;
+            border-radius: 4px;
+        }
+
+        #chat::-webkit-scrollbar-track {
+            background-color: #eee;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -87,7 +111,7 @@
         <div id="chat"></div>
 
         <div id="input-container">
-            <input type="text" id="input" placeholder="Ej: Mi laptop no enciende y solo se queda con luz roja">
+            <input type="text" id="input" placeholder="Ej: Mi laptop no enciende y solo se queda con luz roja" aria-label="Escribe tu mensaje aquí">
             <button id="send">Enviar</button>
         </div>
     </div>
@@ -111,6 +135,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message })
                 });
+
                 const data = await res.json();
                 chatDiv.innerHTML += `<div class="bot"><b>TechSHpc:</b> ${data.response}</div>`;
                 chatDiv.scrollTop = chatDiv.scrollHeight;
@@ -119,8 +144,8 @@
             }
         };
 
-        input.addEventListener("keypress", function(e) {
-            if (e.key === "Enter") sendBtn.click();
+        input.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') sendBtn.click();
         });
     </script>
 </body>
