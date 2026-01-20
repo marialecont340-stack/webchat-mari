@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Técnico Express GPT</title>
+    <style>
+        /* Colores: fondo gris oscuro, chat blanco, textos negro y gris */
+        body { 
+            font-family: Arial, sans-serif; 
+            background: #1e1e1e; 
+            color: #f0f0f0; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+        }
+
+        h2 { 
+            text-align: center; 
+            color: #ffffff; 
+            margin-bottom: 20px;
+        }
+
+        #chat { 
+            border: 1px solid #555; 
+            padding: 10px; 
+            height: 400px; 
+            overflow-y: scroll; 
+            background: #f9f9f9; 
+            color: #000; 
+            width: 100%; 
+            max-width: 600px; 
+            border-radius: 10px;
+        }
+
+        #input { 
+            width: 75%; 
+            padding: 10px; 
+            border: 1px solid #555; 
+            border-radius: 5px; 
+            margin-top: 10px; 
+            background: #2c2c2c; 
+            color: #f0f0f0; 
+            border: none;
+        }
+
+        #send { 
+            padding: 10px 20px; 
+            margin-left: 5px; 
+            border: none; 
+            border-radius: 5px; 
+            background: #444; 
+            color: #f0f0f0; 
+            cursor: pointer;
+        }
+
+        #send:hover { background: #666; }
+
+        .user { color: #1a73e8; margin: 5px 0; font-weight: bold; }
+        .bot { color: #2e7d32; margin: 5px 0; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>Técnico Express GPT</h2>
+    <div id="chat"></div>
+    <input type="text" id="input" placeholder="Escribe tu problema técnico aquí">
+    <button id="send">Enviar</button>
+
+    <script>
+        const chatDiv = document.getElementById('chat');
+        const input = document.getElementById('input');
+        const sendBtn = document.getElementById('send');
+
+        sendBtn.onclick = async () => {
+            const mensaje = input.value.trim();
+            if (!mensaje) return;
+            chatDiv.innerHTML += `<div class="user"><b>Tú:</b> ${mensaje}</div>`;
+            input.value = '';
+
+            try {
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: mensaje })
+                });
+                const data = await res.json();
+                chatDiv.innerHTML += `<div class="bot"><b>Bot:</b> ${data.response}</div>`;
+                chatDiv.scrollTop = chatDiv.scrollHeight;
+            } catch (err) {
+                chatDiv.innerHTML += `<div class="bot"><b>Bot:</b> Error al conectar con el servidor.</div>`;
+            }
+        };
+    </script>
+</body>
+</html>
