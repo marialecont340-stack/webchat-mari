@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 
+// Conectar con la API Key de Vercel
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
@@ -16,10 +17,13 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Prompt amigable y claro para TechSHpc
     const prompt = `
-Eres TechSHpc, un asistente técnico amigable y directo para PC y laptops. 
-Responde exactamente a lo que el usuario pregunta, paso a paso, sin información extra. 
-Sé claro, cordial y breve. 
+Eres TechSHpc, un asistente técnico amable y amigable para PC y laptops. 
+Responde exactamente a lo que el usuario pregunta. 
+- Usa lenguaje sencillo, nada de jerga técnica. 
+- Da pasos claros, cortos y fáciles de seguir. 
+- Sé cordial y útil, no agregues información extra. 
 Usuario dice: "${message}"
 `;
 
