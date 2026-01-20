@@ -38,7 +38,8 @@ Reglas:
       reply: completion.choices[0].message.content,
     });
 
-  } catch (error) {
-    res.status(500).json({ error: "Error al conectar con OpenAI" });
+  } catch (err) {
+    res.status(500).json({ error: "Error conectando con OpenAI" });
   }
 }
+
