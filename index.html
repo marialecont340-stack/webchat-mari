@@ -2,15 +2,14 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>GymBro AI</title>
+    <title>TechSHpc</title>
     <style>
-        /* Paleta de colores: gris y blanco */
         :root {
             --bg-dark: #2b2b2b;
             --bg-light: #f5f5f5;
             --accent: #ffffff;
-            --user-color: #90caf9;   /* azul claro para usuario */
-            --bot-color: #a5d6a7;    /* verde claro para bot */
+            --user-color: #90caf9;
+            --bot-color: #a5d6a7;
         }
 
         body {
@@ -50,22 +49,10 @@
             margin-bottom: 15px;
         }
 
-        .user {
-            color: var(--user-color);
-            font-weight: bold;
-            margin: 5px 0;
-        }
+        .user { color: var(--user-color); font-weight: bold; margin: 5px 0; }
+        .bot { color: var(--bot-color); font-weight: bold; margin: 5px 0; }
 
-        .bot {
-            color: var(--bot-color);
-            font-weight: bold;
-            margin: 5px 0;
-        }
-
-        #input-container {
-            display: flex;
-        }
-
+        #input-container { display: flex; }
         #input {
             flex: 1;
             padding: 12px 15px;
@@ -86,34 +73,21 @@
             transition: background-color 0.3s;
         }
 
-        #send:hover {
-            background-color: #777;
-        }
+        #send:hover { background-color: #777; }
 
-        /* Scrollbar elegante */
-        #chat::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        #chat::-webkit-scrollbar-thumb {
-            background-color: #bbb;
-            border-radius: 4px;
-        }
-
-        #chat::-webkit-scrollbar-track {
-            background-color: #eee;
-            border-radius: 4px;
-        }
+        #chat::-webkit-scrollbar { width: 8px; }
+        #chat::-webkit-scrollbar-thumb { background-color: #bbb; border-radius: 4px; }
+        #chat::-webkit-scrollbar-track { background-color: #eee; border-radius: 4px; }
     </style>
 </head>
 <body>
-    <h2>GymBro AI</h2>
+    <h2>TechSHpc</h2>
 
     <div id="chat-container">
         <div id="chat"></div>
 
         <div id="input-container">
-            <input type="text" id="input" placeholder="Escribe tu pregunta sobre ejercicio, nutrición o motivación">
+            <input type="text" id="input" placeholder="Ej: Mi laptop no enciende y solo se queda con luz roja">
             <button id="send">Enviar</button>
         </div>
     </div>
@@ -127,7 +101,6 @@
             const message = input.value.trim();
             if (!message) return;
 
-            // Mostrar mensaje del usuario
             chatDiv.innerHTML += `<div class="user"><b>Tú:</b> ${message}</div>`;
             input.value = '';
             chatDiv.scrollTop = chatDiv.scrollHeight;
@@ -139,16 +112,13 @@
                     body: JSON.stringify({ message })
                 });
                 const data = await res.json();
-
-                // Mostrar respuesta del bot
-                chatDiv.innerHTML += `<div class="bot"><b>GymBro:</b> ${data.response}</div>`;
+                chatDiv.innerHTML += `<div class="bot"><b>TechSHpc:</b> ${data.response}</div>`;
                 chatDiv.scrollTop = chatDiv.scrollHeight;
             } catch (err) {
-                chatDiv.innerHTML += `<div class="bot"><b>GymBro:</b> Error al conectar con el servidor.</div>`;
+                chatDiv.innerHTML += `<div class="bot"><b>TechSHpc:</b> Error al conectar con el servidor.</div>`;
             }
         };
 
-        // Enviar con Enter
         input.addEventListener("keypress", function(e) {
             if (e.key === "Enter") sendBtn.click();
         });
