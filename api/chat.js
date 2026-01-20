@@ -5,25 +5,35 @@ const openai = new OpenAI({
 });
 
 export default async function handler(req, res) {
-  if (req.method === 'POST') {
-    const { message } = req.body;
+  if (req.method !== "POST") {
+    return res.status(405).json({ response: "Método no permitido." });
+  }
 
-    try {
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "user",
-            content: `Eres Técnico Express GPT, un asistente experto en resolver problemas de PC y laptops. Responde de manera clara, paso a paso y breve: ${message}`
-          }
-        ]
-      });
+  const { message } = req.body;
 
-      res.status(200).json({ response: completion.choices[0].message.content });
-    } catch (err) {
-      res.status(500).json({ response: "Error con OpenAI: " + err.message });
-    }
-  } else {
-    res.status(405).json({ response: "Método no permitido" });
+  if (!message || message.trim() === "") {
+    return res.status(400).json({ response: "Por favor, escribe tu problema técnico." });
+  }
+
+  try {
+    const prompt = `
+Eres TechSHpc, un asistente técnico amigable y directo para PC y laptops. 
+Responde exactamente a lo que el usuario pregunta, paso a paso, sin información extra. 
+Sé claro, cordial y breve. 
+Usuario dice: "${message}"
+`;
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [{ role: "user", content: prompt }]
+    });
+
+    const responseText = completion.choices[0].message.content.trim();
+
+    res.status(200).json({ response: responseText });
+
+  } catch (err) {
+    console.error("Error OpenAI:", err.message);
+    res.status(500).json({ response: "Error conectando con OpenAI." });
   }
 }
