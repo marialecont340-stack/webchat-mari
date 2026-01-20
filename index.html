@@ -2,10 +2,9 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>TechSHpc ⚙️ Asistente IA de Soporte Técnico</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>💻 TechSHpc ⚡ Asistente IA</title>
   <style>
-    /* ---- ESTILO GENERAL ---- */
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -16,10 +15,8 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
-      overflow: hidden;
     }
 
-    /* ---- CONTENEDOR PRINCIPAL ---- */
     .chat {
       width: 420px;
       max-width: 95%;
@@ -38,7 +35,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* ---- ENCABEZADO ---- */
     .header {
       text-align: center;
       font-size: 22px;
@@ -48,56 +44,83 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    .header span {
-      font-size: 28px;
-    }
 
-    /* ---- ÁREA DE MENSAJES ---- */
     .messages {
+      flex: 1;
       background: #2a2d33;
-      height: 300px;
       padding: 10px;
       border-radius: 10px;
       overflow-y: auto;
-      margin-bottom: 12px;
       font-size: 14px;
       scrollbar-width: thin;
       scrollbar-color: #1e90ff #2a2d33;
     }
-    .messages::-webkit-scrollbar {
-      width: 6px;
-    }
+    .messages::-webkit-scrollbar { width: 6px; }
     .messages::-webkit-scrollbar-thumb {
       background: #1e90ff;
       border-radius: 4px;
     }
 
-    /* ---- BURBUJAS DE CHAT ---- */
     .msg {
-      margin: 6px 0;
-      padding: 8px 12px;
-      border-radius: 10px;
-      max-width: 85%;
+      margin: 8px 0;
+      padding: 10px 14px;
+      border-radius: 12px;
+      max-width: 80%;
       line-height: 1.4;
       word-wrap: break-word;
+      white-space: pre-wrap;
+      animation: appear 0.2s ease-in;
     }
+
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .user {
-      align-self: flex-end;
       background: #1e90ff;
       color: white;
+      align-self: flex-end;
       border-bottom-right-radius: 2px;
     }
     .bot {
-      align-self: flex-start;
       background: #3c3f46;
-      border-bottom-left-radius: 2px;
       color: #9cff9c;
+      align-self: flex-start;
+      border-bottom-left-radius: 2px;
     }
 
-    /* ---- ÁREA DE INPUT ---- */
+    .typing {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #3c3f46;
+      color: #bbb;
+      align-self: flex-start;
+      border-radius: 12px;
+      padding: 8px 12px;
+      margin: 8px 0;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      background: #9cff9c;
+      border-radius: 50%;
+      animation: blink 1.4s infinite;
+    }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes blink {
+      0%, 80%, 100% { opacity: 0.3; }
+      40% { opacity: 1; }
+    }
+
     .input {
       display: flex;
       gap: 10px;
+      margin-top: 10px;
     }
     input {
       flex: 1;
@@ -122,7 +145,6 @@
     button:hover { background: #3aa1ff; }
     button:active { transform: scale(0.96); }
 
-    /* ---- PIE DE PÁGINA ---- */
     .footer {
       text-align: center;
       margin-top: 8px;
@@ -135,14 +157,14 @@
 
   <div class="chat">
     <div class="header">
-      <span>💻 TechSHpc ⚡</span><br>
+      💻 TechSHpc ⚡ <br>
       <small>Asistente IA de soporte técnico</small>
     </div>
 
     <div id="messages" class="messages">
       <div class="msg bot">
         👋 ¡Hola! Soy <b>TechSHpc</b>, tu asistente de hardware y software.<br>
-        Cuéntame tu problema y te ayudaré paso a paso 🧠🔧
+        Cuéntame qué problema tienes y te ayudaré paso a paso 🧠🔧
       </div>
     </div>
 
@@ -169,23 +191,24 @@
       addMessage("user", text);
       input.value = "";
 
-      // efecto de "escribiendo..."
-      const typingMsg = addMessage("bot", "⌛ Procesando tu consulta...");
+      // Añade animación "TechSHpc está escribiendo..."
+      const typing = createTyping();
 
       try {
-        // 🔗 conexión al backend (se agregará después)
         const res = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: text })
         });
 
+        if (!res.ok) throw new Error("Error en la conexión con el servidor");
+
         const data = await res.json();
-        typingMsg.remove();
-        addMessage("bot", data.reply || "No pude procesar tu solicitud. 🤖");
+        typing.remove();
+        addMessage("bot", data.reply || "No pude procesar tu solicitud 🤖");
       } catch (err) {
-        typingMsg.remove();
-        addMessage("bot", "⚠️ Error al conectar con el servidor.");
+        typing.remove();
+        addMessage("bot", "⚠️ Error: " + err.message);
       }
     }
 
@@ -196,6 +219,20 @@
       messages.appendChild(msg);
       messages.scrollTop = messages.scrollHeight;
       return msg;
+    }
+
+    function createTyping() {
+      const typing = document.createElement("div");
+      typing.className = "typing";
+      typing.innerHTML = `
+        TechSHpc está escribiendo
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      `;
+      messages.appendChild(typing);
+      messages.scrollTop = messages.scrollHeight;
+      return typing;
     }
   </script>
 
