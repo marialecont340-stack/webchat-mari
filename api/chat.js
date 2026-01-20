@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 
-// Conectar con la API Key de Vercel
+// Crear instancia de OpenAI con la API Key
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
@@ -17,27 +17,22 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Prompt amigable y claro para TechSHpc
     const prompt = `
 Eres TechSHpc, un asistente técnico amable y amigable para PC y laptops.
 Responde exactamente a lo que el usuario pregunta.
 - Usa lenguaje sencillo, nada de jerga técnica.
 - Da pasos claros, cortos y fáciles de seguir.
 - Sé cordial y útil, no agregues información extra.
-
 Usuario dice: "${message}"
 `;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // Asegúrate que este modelo esté disponible en tu cuenta
-      messages: [{ role: "user", content: prompt }]
+      model: "gpt-4o-mini",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 300 // limita la respuesta para mantenerla concisa
     });
 
-    const responseText = completion.choices[0]?.message?.content?.trim();
-
-    if (!responseText) {
-      return res.status(500).json({ response: "No se recibió respuesta del modelo." });
-    }
+    const responseText = completion.choices?.[0]?.message?.content?.trim() || "No se recibió respuesta del modelo.";
 
     res.status(200).json({ response: responseText });
 
