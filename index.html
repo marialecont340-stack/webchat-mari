@@ -2,83 +2,104 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TechSHpc - Asistente IA</title>
   <style>
-    body {
-      margin: 0;
+    body{
+      margin:0;
       font-family: Arial, sans-serif;
-      background-color: #2e2e2e; /* Fondo general gris oscuro */
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      background:#2e2e2e;
+      color:white;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
     }
-
-    .chat-container {
-      background-color: #3b3b3b; /* Caja de chat gris */
-      padding: 20px;
-      border-radius: 15px;
-      width: 400px;
-      max-width: 90%;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    .chat{
+      width:420px;
+      max-width:95%;
+      background:#3b3b3b;
+      padding:20px;
+      border-radius:15px;
+      box-shadow:0 0 15px rgba(0,0,0,.5);
     }
-
-    .chat-header {
-      text-align: center;
-      font-size: 24px;
-      margin-bottom: 20px;
+    .header{
+      text-align:center;
+      font-size:24px;
+      margin-bottom:15px;
     }
-
-    .chat-header span {
-      font-size: 28px; /* Emojis un poco más grandes */
+    .messages{
+      background:#2a2a2a;
+      height:250px;
+      padding:10px;
+      border-radius:10px;
+      overflow-y:auto;
+      margin-bottom:10px;
+      font-size:14px;
     }
-
-    .input-container {
-      display: flex;
-      gap: 10px;
+    .user{color:#6ec1ff;margin-bottom:5px;}
+    .bot{color:#9cff9c;margin-bottom:10px;}
+    .input{
+      display:flex;
+      gap:10px;
     }
-
-    .input-container input {
-      flex: 1;
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      font-size: 16px;
-      background-color: #555; /* Caja de texto gris más claro */
-      color: white;
+    input{
+      flex:1;
+      padding:10px;
+      border:none;
+      border-radius:8px;
+      background:#555;
+      color:white;
     }
-
-    .input-container input::placeholder {
-      color: #ccc;
-    }
-
-    .input-container button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      background-color: #1e90ff; /* Azul llamativo para el botón */
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    .input-container button:hover {
-      background-color: #1c7ed6;
+    button{
+      padding:10px 20px;
+      border:none;
+      border-radius:8px;
+      background:#1e90ff;
+      color:white;
+      font-weight:bold;
+      cursor:pointer;
     }
   </style>
 </head>
 <body>
-  <div class="chat-container">
-    <div class="chat-header">
-      TechSHpc 💻🛠️⚡
-    </div>
-    <div class="input-container">
-      <input type="text" placeholder="Escribe tu problema con la PC, ejemplo: 'Mi laptop no enciende'">
-      <button>Enviar</button>
-    </div>
+
+<div class="chat">
+  <div class="header">TechSHpc 💻🛠️⚡</div>
+  <div id="messages" class="messages">
+    <div class="bot">TechSHpc: Hola 👋 ¿En qué puedo ayudarte con tu PC?</div>
   </div>
+  <div class="input">
+    <input id="userInput" placeholder="Ej: Mi laptop no enciende">
+    <button onclick="sendMessage()">Enviar</button>
+  </div>
+</div>
+
+<script>
+async function sendMessage(){
+  const input = document.getElementById("userInput");
+  const text = input.value.trim();
+  if(!text) return;
+
+  add("user","Tú: "+text);
+  input.value="";
+
+  const res = await fetch("/api/chat",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({message:text})
+  });
+
+  const data = await res.json();
+  add("bot","TechSHpc: "+data.reply);
+}
+
+function add(type,text){
+  const div=document.createElement("div");
+  div.className=type;
+  div.innerText=text;
+  document.getElementById("messages").appendChild(div);
+}
+</script>
+
 </body>
 </html>
