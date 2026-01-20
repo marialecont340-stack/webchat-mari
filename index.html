@@ -1,10 +1,110 @@
-flex: 1;
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GymBro PRO</title>
+  <style>
+    /* --- Reset --- */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #1a1a1a;
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      background-color: #212121;
+      padding: 15px 20px;
+      border-bottom: 2px solid #ff5722;
+    }
+
+    .avatar {
+      font-size: 32px;
+      margin-right: 10px;
+    }
+
+    .name {
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    #chat {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background-color: #121212;
+    }
+
+    .message {
+      display: flex;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .message.user {
+      justify-content: flex-end;
+    }
+
+    .message.bot {
+      justify-content: flex-start;
+    }
+
+    .bubble {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 14px;
+      line-height: 1.4;
+      font-size: 16px;
+    }
+
+    .user .bubble {
+      background-color: #ff5722;
+      color: white;
+      border-bottom-right-radius: 2px;
+    }
+
+    .bot .bubble {
+      background-color: #2c2c2c;
+      color: #f5f5f5;
+      border-bottom-left-radius: 2px;
+    }
+
+    #input-container {
+      display: flex;
+      align-items: center;
+      padding: 14px;
+      background-color: #212121;
+      border-top: 2px solid #ff5722;
+    }
+
+    #input {
+      flex: 1;
       padding: 12px;
       border-radius: 10px;
       border: none;
       font-size: 16px;
       background: #2c2c2c;
       color: white;
+      outline: none;
+      transition: background 0.2s;
+    }
+
+    #input:focus {
+      background: #333;
     }
 
     #send {
@@ -16,6 +116,7 @@ flex: 1;
       border-radius: 10px;
       font-weight: bold;
       cursor: pointer;
+      transition: background-color 0.2s;
     }
 
     #send:hover {
@@ -55,10 +156,11 @@ flex: 1;
     }
   </style>
 </head>
+
 <body>
   <header>
     <div class="avatar">💪</div>
-    <div class="name">GymBro - Pro</div>
+    <div class="name">GymBro PRO</div>
   </header>
 
   <div id="chat"></div>
@@ -80,10 +182,9 @@ flex: 1;
       const bubble = document.createElement('div');
       bubble.classList.add('bubble');
 
-      // 💡 Corrección visual: Markdown → HTML
       bubble.innerHTML = content
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // Negritas
-        .replace(/\n/g, '<br>');                           // Saltos de línea
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n/g, '<br>');
 
       msgDiv.appendChild(bubble);
       chat.appendChild(msgDiv);
