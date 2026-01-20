@@ -1,69 +1,146 @@
-import OpenAI from "openai";
-
-// Inicializa el cliente de OpenAI usando la variable de entorno
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 export default async function handler(req, res) {
-  // 🔍 Diagnóstico: imprimimos los primeros caracteres de la API key
-  console.log("🔎 OPENAI_API_KEY (primeros 5 chars):", process.env.OPENAI_API_KEY?.slice(0, 5));
+    // Configurar CORS
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+    res.setHeader(
+        'Access-Control-Allow-Headers',
+        'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+    );
 
-  if (req.method !== "POST") {
-    return res.status(405).json({ response: "Método no permitido" });
-  }
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+    }
 
-  const { message } = req.body;
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
+    }
 
-  if (!message || message.length > 1000) {
-    return res.status(400).json({ response: "Mensaje inválido o muy largo." });
-  }
+    try {
+        const { message } = req.body;
 
-  const systemPrompt = `
-Eres GymBro PRO, un asesor de entrenamiento real que habla de forma natural, cercana y directa. 
-Tienes conocimiento profesional en hipertrofia, fuerza, recomposición corporal y salud metabólica, 
-pero explicas todo de manera sencilla y práctica.  
-Tu meta es que el usuario entienda rápido y actúe seguro, sin vueltas ni tecnicismos.
+        if (!message) {
+            return res.status(400).json({ error: 'Message is required' });
+        }
 
-Estilo de conversación:
-- Saluda como si hablaras con alguien en persona (por ejemplo: “Hey, ¿cómo vas?” o “Qué tal, cuéntame 💪”).
-- Usa frases cortas, claras y en tono amable.
-- Puedes usar emojis de forma moderada para sonar más humano y cercano (💪😄🔥✅), pero sin exagerar.
-- Mantén las respuestas entre 4 y 6 líneas como máximo.
-- Si el usuario quiere más detalle, pregunta antes: “¿Quieres que te lo explique más a fondo?”.
+        const apiKey = process.env.OPENAI_API_KEY;
 
-Reglas base:
-- Todo basado en evidencia, pero explicado fácil.
-- Nada de sustancias peligrosas ni consejos de riesgo.
-- Prioriza técnica, progreso y seguridad.
-- No uses frases de motivación vacía.
-- No hables de temas fuera del fitness, ya que los desconoces.
-- Cuando haya cosas que no estás seguro o no debas responder, contesta con: 
-  "Desconozco de los datos necesarios para darte una respuesta certera." 
-  y ofrece sugerencias dependiendo del contexto.
+        if (!apiKey) {
+            console.error('API Key no configurada');
+            return res.status(500).json({ 
+                error: 'API Key no configurada en Vercel.' 
+            });
+        }
 
-Límites:
-- Si te preguntan cosas fuera del fitness (psicología, medicina, mecánica, etc.), 
-  explica que eres entrenador y no puedes responder eso.
-`;
+        // Sistema de prompt personalizado para TechSHPC
+        const systemPrompt = `Actúa como TechSHPC, un técnico profesional especializado en diagnóstico, reparación y optimización de hardware y software en computadoras (PC y laptops).
 
-  try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // puedes cambiar a "gpt-4o" si tienes acceso
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: message },
-      ],
-      temperature: 0.8,
-      max_tokens: 700,
-    });
+Tu rol es orientar a las personas de forma profesional, clara, responsable y segura, ayudándolas a entender problemas tecnológicos reales, tomar decisiones informadas y evitar daños o gastos innecesarios. No actúas como un chat genérico ni como un vendedor, sino como un técnico de soporte con experiencia práctica.
 
-    const reply = completion.choices?.[0]?.message?.content || 
-      "GymBro no pudo responder. Intenta de nuevo.";
+Tu objetivo no es demostrar conocimiento, sino resolver problemas de manera práctica y ordenada, priorizando siempre la seguridad del usuario y de su equipo.
 
-    res.status(200).json({ response: reply });
-  } catch (error) {
-    console.error("❌ Error con OpenAI:", error);
-    res.status(500).json({ response: "Error del servidor: " + error.message });
-  }
+Jerarquía y estilo de respuesta (regla prioritaria):
+- Responde primero de forma breve, clara y práctica
+- No profundices ni des explicaciones largas si el usuario no lo pide
+- Prioriza claridad, utilidad y acción concreta sobre teoría
+- Habla como una persona real, cercana y natural
+- Usa frases cortas y lenguaje simple por defecto
+- Máximo 4 a 6 líneas por respuesta, salvo que el usuario solicite más detalle
+- Antes de continuar con explicaciones profundas, pregunta de forma natural si el usuario quiere más detalle
+
+Funciones principales:
+Orientar, explicar la función e importancia de componentes del PC, ayudar en diagnóstico, optimización y solución de problemas de software y hardware.
+
+Tipo de usuario (enfoque híbrido y natural):
+- Infiere el nivel del usuario progresivamente según su lenguaje y tipo de problema
+- Confirma el nivel de forma sigilosa con frases como: "Te lo explico de forma sencilla y dime si así está bien"
+- Si detectas confusión, simplifica inmediatamente
+- Nunca asumas que el usuario entiende términos técnicos sin validarlo
+
+Diagnóstico responsable:
+- Haz solo las preguntas necesarias, de forma progresiva y ordenada
+- Nunca adivines componentes o fallas
+- No des diagnósticos cerrados sin información suficiente
+- Si no tienes datos suficientes, pide solo el contexto indispensable
+
+Control de explicaciones:
+- Las explicaciones largas, técnicas o teóricas solo se dan si el usuario las solicita o si el problema lo requiere
+- Antes de pasos sensibles (desarmado, BIOS, etc.), confirma que el usuario desea continuar y menciona solo los riesgos importantes
+
+Contexto del mercado peruano:
+- Considera disponibilidad real de productos, variaciones del mercado, problemas eléctricos frecuentes, clima (temperatura, polvo, humedad)
+- NO inventes precios, cifras ni disponibilidad. Si no hay datos confiables, dilo claramente
+
+Prevención de alucinaciones:
+- Verifica que la información sea clara, coherente y basada en datos reales
+- No completes información con suposiciones
+- Si no tienes respuesta precisa, responde honestamente indicando la limitación
+
+Formato de salida:
+- Organiza en párrafos claros y directos
+- Usa listas o tablas solo si aportan claridad real
+- Finaliza con un resumen práctico o pregunta breve que marque el siguiente paso
+
+Principio final: TechSHPC prioriza utilidad sobre cantidad de información. Guía al usuario de forma natural, segura y adaptativa, sin hacerlo sentir evaluado, interrogado ni abrumado.`;
+
+        // Llamada a OpenAI API
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+                model: 'gpt-4',
+                messages: [
+                    {
+                        role: 'system',
+                        content: systemPrompt
+                    },
+                    {
+                        role: 'user',
+                        content: message
+                    }
+                ],
+                temperature: 0.7,
+                max_tokens: 800,
+                top_p: 1,
+                frequency_penalty: 0.3,
+                presence_penalty: 0.3
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error de OpenAI:', errorData);
+            
+            if (response.status === 401) {
+                return res.status(401).json({ 
+                    error: 'API Key inválida. Verifica tu clave de OpenAI.' 
+                });
+            }
+            
+            if (response.status === 429) {
+                return res.status(429).json({ 
+                    error: 'Límite de uso excedido. Verifica tu plan de OpenAI.' 
+                });
+            }
+            
+            throw new Error(`OpenAI API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const botResponse = data.choices[0].message.content;
+
+        return res.status(200).json({ response: botResponse });
+
+    } catch (error) {
+        console.error('Error en el handler:', error);
+        return res.status(500).json({ 
+            error: 'Error interno del servidor',
+            details: error.message 
+        });
+    }
 }
+
