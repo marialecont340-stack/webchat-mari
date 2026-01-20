@@ -19,25 +19,30 @@ export default async function handler(req, res) {
   try {
     // Prompt amigable y claro para TechSHpc
     const prompt = `
-Eres TechSHpc, un asistente técnico amable y amigable para PC y laptops. 
-Responde exactamente a lo que el usuario pregunta. 
-- Usa lenguaje sencillo, nada de jerga técnica. 
-- Da pasos claros, cortos y fáciles de seguir. 
-- Sé cordial y útil, no agregues información extra. 
+Eres TechSHpc, un asistente técnico amable y amigable para PC y laptops.
+Responde exactamente a lo que el usuario pregunta.
+- Usa lenguaje sencillo, nada de jerga técnica.
+- Da pasos claros, cortos y fáciles de seguir.
+- Sé cordial y útil, no agregues información extra.
+
 Usuario dice: "${message}"
 `;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o-mini", // Asegúrate que este modelo esté disponible en tu cuenta
       messages: [{ role: "user", content: prompt }]
     });
 
-    const responseText = completion.choices[0].message.content.trim();
+    const responseText = completion.choices[0]?.message?.content?.trim();
+
+    if (!responseText) {
+      return res.status(500).json({ response: "No se recibió respuesta del modelo." });
+    }
 
     res.status(200).json({ response: responseText });
 
   } catch (err) {
-    console.error("Error OpenAI:", err.message);
+    console.error("Error OpenAI:", err?.message || err);
     res.status(500).json({ response: "Error conectando con OpenAI." });
   }
 }
