@@ -1,21 +1,27 @@
 import OpenAI from "openai";
 
+// Inicializa cliente OpenAI con tu API Key desde Vercel
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
 export default async function handler(req, res) {
+  // Solo acepta método POST
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Método no permitido" });
+    res.setHeader("Allow", ["POST"]);
+    return res.status(405).json({ error: "Método no permitido. Usa POST." });
   }
 
-  const { message } = req.body;
+  try {
+    const { message } = req.body;
 
-  if (!message || typeof message !== "string") {
-    return res.status(400).json({ error: "Mensaje no válido" });
-  }
+    // Validación básica
+    if (!message || typeof message !== "string") {
+      return res.status(400).json({ error: "Mensaje no válido o vacío." });
+    }
 
-  const systemPrompt = `
+    // Prompt del asistente TechSHpc
+    const systemPrompt = `
 Eres TechSHpc, un asistente técnico experto en computadoras, software, hardware, laptops, redes y tecnología general.
 
 🧠 Tu estilo:
@@ -23,40 +29,39 @@ Eres TechSHpc, un asistente técnico experto en computadoras, software, hardware
 - Respuestas simples, directas y útiles
 - Usa emojis para sonar humano (💻🔌🛠️✅), pero sin exagerar
 - Organiza con numeración o guiones si hace falta
-- Nada de lenguaje técnico complicado ni jerga
-- No des explicaciones largas o rebuscadas
+- Evita tecnicismos o explicaciones rebuscadas
 
-⚠️ Reglas claras:
-- Solo hablas de tecnología (nada de salud, emociones, ni temas personales)
-- Si te preguntan algo fuera del tema tech, responde con respeto: “Solo puedo ayudarte con cosas de tecnología 😉”
-- Siempre prioriza utilidad y buena onda
-- Si no estás seguro de una respuesta, di: “No tengo los datos exactos para eso, pero te recomiendo...”
+⚙️ Reglas:
+- Solo hablas de tecnología (si te preguntan algo fuera de eso, di: “Solo puedo ayudarte con cosas de tecnología 😉”)
+- Prioriza utilidad y tono buena onda
+- Si no estás seguro, di: “No tengo los datos exactos, pero te recomiendo...” 
 
-🎯 Tu objetivo:
-Resolver dudas tecnológicas como si fueras un técnico con buena vibra hablando por WhatsApp.
+🎯 Objetivo:
+Ayudar como técnico amigable que guía paso a paso en la resolución de problemas con PC/laptops.
 `;
 
-  try {
+    // Llamada a la API de OpenAI
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o", // Cambia a "gpt-3.5-turbo" si no tiene acceso
+      model: "gpt-4o", // o "gpt-3.5-turbo" si no tienes acceso
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: message }
+        { role: "user", content: message },
       ],
-      temperature: 0.5,
-      max_tokens: 1000
+      temperature: 0.6,
+      max_tokens: 800,
     });
 
-    const reply = completion?.choices?.[0]?.message?.content;
+    const reply = completion?.choices?.[0]?.message?.content?.trim();
 
     if (!reply) {
-      return res.status(500).json({ error: "La respuesta del modelo está vacía." });
+      return res.status(500).json({ error: "No se recibió respuesta del modelo." });
     }
 
-    res.status(200).json({ reply });
-
-  } catch (err) {
-    console.error("❌ Error OpenAI:", err);
-    res.status(500).json({ error: "Error al conectar con OpenAI." });
+    // Respuesta correcta al frontend
+    res.setHeader("Content-Type", "application/json");
+    return res.status(200).json({ reply });
+  } catch (error) {
+    console.error("❌ Error en OpenAI:", error);
+    res.status(500).json({ error: "Error al conectar con OpenAI o procesar la solicitud." });
   }
 }
