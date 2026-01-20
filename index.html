@@ -68,11 +68,16 @@
   <div id="messages" class="messages"></div>
   <div class="input">
     <input id="userInput" placeholder="Ej: Mi laptop no enciende">
-    <button onclick="sendMessage()">Enviar</button>
+    <button id="sendBtn">Enviar</button>
   </div>
 </div>
 
 <script>
+document.getElementById("sendBtn").addEventListener("click", sendMessage);
+document.getElementById("userInput").addEventListener("keypress", function(e){
+  if(e.key === "Enter") sendMessage();
+});
+
 async function sendMessage(){
   const input = document.getElementById("userInput");
   const text = input.value.trim();
@@ -92,4 +97,12 @@ async function sendMessage(){
 }
 
 function add(type,text){
-  const div=docu
+  const div=document.createElement("div");
+  div.className=type;
+  div.innerText=text;
+  document.getElementById("messages").appendChild(div);
+}
+</script>
+
+</body>
+</html>
