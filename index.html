@@ -65,9 +65,7 @@
 
 <div class="chat">
   <div class="header">TechSHpc 💻🛠️⚡</div>
-  <div id="messages" class="messages">
-    <div class="bot">TechSHpc: Hola 👋 ¿En qué puedo ayudarte con tu PC?</div>
-  </div>
+  <div id="messages" class="messages"></div>
   <div class="input">
     <input id="userInput" placeholder="Ej: Mi laptop no enciende">
     <button onclick="sendMessage()">Enviar</button>
@@ -94,12 +92,4 @@ async function sendMessage(){
 }
 
 function add(type,text){
-  const div=document.createElement("div");
-  div.className=type;
-  div.innerText=text;
-  document.getElementById("messages").appendChild(div);
-}
-</script>
-
-</body>
-</html>
+  const div=docu
