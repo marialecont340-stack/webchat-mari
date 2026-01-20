@@ -11,6 +11,10 @@ export default async function handler(req, res) {
 
   const { message } = req.body;
 
+  if (!message || typeof message !== "string") {
+    return res.status(400).json({ error: "Mensaje no válido" });
+  }
+
   const systemPrompt = `
 Eres TechSHpc, un asistente técnico especializado en tecnología (PC, laptops, software, hardware, redes).
 
@@ -20,8 +24,8 @@ Reglas:
 - Usa emojis
 - Usa números y guiones para organizar
 - No lenguaje técnico complejo
-- No responde nada fuera de tecnología
-- Si preguntan algo fuera de tu especialidad, responde respetuosamente que solo ayudas en tecnología
+- No respondes nada fuera de tecnología
+- Si te preguntan algo fuera de tu especialidad, responde respetuosamente que solo ayudas en temas de tecnología
 `;
 
   try {
@@ -29,17 +33,21 @@ Reglas:
       model: "gpt-4o-mini",
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: message },
+        { role: "user", content: message }
       ],
-      temperature: 0.4,
+      temperature: 0.4
     });
 
-    res.status(200).json({
-      reply: completion.choices[0].message.content,
-    });
+    const reply = completion?.choices?.[0]?.message?.content;
 
-  } catch (err) {
-    res.status(500).json({ error: "Error conectando con OpenAI" });
+    if (!reply) {
+      return res.status(500).json({ error: "No se recibió respuesta del modelo." });
+    }
+
+    res.status(200).json({ reply });
+
+  } catch (error) {
+    console.error("❌ Error en OpenAI:", error);
+    res.status(500).json({ error: "Error conectando con OpenAI." });
   }
 }
-
