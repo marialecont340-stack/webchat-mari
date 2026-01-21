@@ -1,1 +1,321 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TechSHpc - Chat Técnico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --morado-oscuro: #2E1065;      /* morado ultra oscuro */
+      --azul-casi-negro: #020617;    /* azul muy oscuro */
+      --texto-principal: #FFFFFF;
+      --gris-suave: #1F2937;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at top, #111827 0, #020617 40%, #000000 100%);
+      color: var(--texto-principal);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .chat-wrapper {
+      width: 100%;
+      max-width: 420px;
+      background: rgba(2, 6, 23, 0.95);
+      border-radius: 18px;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      padding: 14px 18px;
+      background: linear-gradient(90deg, var(--morado-oscuro), var(--azul-casi-negro));
+      border-bottom: 1px solid rgba(148, 163, 184, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chat-title {
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .chat-subtitle {
+      font-size: 0.74rem;
+      color: #CBD5F5;
+      opacity: 0.9;
+    }
+
+    .chat-body {
+      padding: 14px;
+      background: var(--azul-casi-negro);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 450px;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+    }
+
+    .message-row {
+      display: flex;
+      width: 100%;
+    }
+
+    .message-row.bot {
+      justify-content: flex-start;
+    }
+
+    .message-row.user {
+      justify-content: flex-end;
+    }
+
+    .message-bubble {
+      max-width: 78%;
+      padding: 9px 11px;
+      border-radius: 14px;
+      font-size: 0.82rem;
+      line-height: 1.4;
+      word-wrap: break-word;
+      word-break: break-word;
+    }
+
+    .message-row.bot .message-bubble {
+      background: #111827;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-bottom-left-radius: 4px;
+    }
+
+    .message-row.user .message-bubble {
+      background: var(--morado-oscuro);
+      border: 1px solid rgba(192, 132, 252, 0.4);
+      border-bottom-right-radius: 4px;
+    }
+
+    .chat-footer {
+      padding: 10px;
+      background: rgba(15, 23, 42, 0.96);
+      border-top: 1px solid rgba(148, 163, 184, 0.35);
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 9px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: #020617;
+      color: var(--texto-principal);
+      font-size: 0.82rem;
+      outline: none;
+      transition: border 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+    }
+
+    .chat-input::placeholder {
+      color: #6B7280;
+      font-size: 0.8rem;
+    }
+
+    .chat-input:focus {
+      border-color: rgba(192, 132, 252, 0.9);
+      box-shadow: 0 0 0 1px rgba(192, 132, 252, 0.4);
+      background: #020617;
+    }
+
+    .send-button {
+      padding: 9px 14px;
+      border-radius: 999px;
+      border: none;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--morado-oscuro), #1D267D);
+      color: var(--texto-principal);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease, filter 0.12s ease;
+      white-space: nowrap;
+    }
+
+    .send-button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(88, 28, 135, 0.6);
+      filter: brightness(1.05);
+    }
+
+    .send-button:active {
+      transform: translateY(0);
+      box-shadow: none;
+      opacity: 0.9;
+    }
+
+    .send-icon {
+      font-size: 0.8rem;
+    }
+
+    .small-hint {
+      margin-top: 4px;
+      font-size: 0.7rem;
+      color: #9CA3AF;
+      opacity: 0.85;
+      text-align: right;
+    }
+
+    /* Scrollbar suave (solo en navegadores que lo soporten) */
+    .chat-body::-webkit-scrollbar {
+      width: 6px;
+    }
+    .chat-body::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .chat-body::-webkit-scrollbar-thumb {
+      background: #4B5563;
+      border-radius: 999px;
+    }
+
+    @media (max-width: 480px) {
+      .chat-wrapper {
+        max-width: 100%;
+      }
+      .chat-title {
+        font-size: 0.9rem;
+      }
+      .chat-subtitle {
+        font-size: 0.7rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-wrapper">
+    <header class="chat-header">
+      <div>
+        <div class="chat-title">TechSHpc</div>
+        <div class="chat-subtitle">Asistente técnico para tu PC</div>
+      </div>
+    </header>
+
+    <main id="chat-body" class="chat-body">
+      <!-- Mensaje de ejemplo del bot -->
+      <div class="message-row bot">
+        <div class="message-bubble">
+          Hola 👋 Soy TechSHpc. Cuéntame qué le pasa a tu PC y te voy guiando paso a paso.
+        </div>
+      </div>
+
+      <!-- Mensaje de ejemplo del usuario -->
+      <div class="message-row user">
+        <div class="message-bubble">
+          Mi PC está muy lenta y no sé por qué.
+        </div>
+      </div>
+    </main>
+
+    <footer class="chat-footer">
+      <form id="chat-form" class="input-row">
+        <input
+          id="user-input"
+          type="text"
+          class="chat-input"
+          placeholder="Escribe tu problema, ej: mi PC está lenta"
+          autocomplete="off"
+        />
+        <button type="submit" class="send-button">
+          Enviar
+          <span class="send-icon">➤</span>
+        </button>
+      </form>
+      <div class="small-hint">
+        Enter también envía el mensaje.
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const form = document.getElementById("chat-form");
+    const input = document.getElementById("user-input");
+    const chatBody = document.getElementById("chat-body");
+
+    function addMessage(text, from = "user") {
+      const row = document.createElement("div");
+      row.className = "message-row " + from;
+
+      const bubble = document.createElement("div");
+      bubble.className = "message-bubble";
+      bubble.textContent = text;
+
+      row.appendChild(bubble);
+      chatBody.appendChild(row);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+
+      // muestra mensaje del usuario
+      addMessage(text, "user");
+      input.value = "";
+
+      try {
+        // llamada a tu backend en Vercel (ruta /api/chat)
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ message: text })
+        });
+
+        if (!response.ok) {
+          addMessage("Ocurrió un error en el servidor. Intenta de nuevo más tarde.", "bot");
+          return;
+        }
+
+        const data = await response.json();
+        // asumo que tu backend devuelve { response: "texto del bot" }
+        addMessage(data.response || "No recibí una respuesta válida del servidor.", "bot");
+      } catch (error) {
+        console.error(error);
+        addMessage("No pude conectar con el servidor. Verifica tu conexión o el backend.", "bot");
+      }
+    });
+
+    // Permitir Enter para enviar (ya lo hace el form, esto es por si acaso en móviles)
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        form.dispatchEvent(new Event("submit"));
+      }
+    });
+  </script>
+</body>
+</html>
 
