@@ -1,61 +1,143 @@
-import OpenAI from "openai";
+const apiKey = process.env.OPENAI_API_KEY;
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Método no permitido" });
-  }
-
-  const { message } = req.body;
-
-  if (!message || typeof message !== "string") {
-    return res.status(400).json({
-      response: "Por favor escribe tu problema para poder ayudarte 🙂",
-    });
-  }
-
-  try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4.1-mini",
-      messages: [
-        {
-          role: "system",
-          content: `
-Eres TechSHPC, un técnico profesional especializado en PCs y laptops.
-Responde de forma clara, práctica y amable.
-Usa lenguaje simple y frases cortas.
-Máximo 4 a 6 líneas por respuesta.
-Usa emojis con moderación y solo si ayudan 🙂
-No expliques de más si no te lo piden.
-Si falta información, pregunta solo lo necesario.
-          `.trim(),
-        },
-        {
-          role: "user",
-          content: message,
-        },
-      ],
-      max_tokens: 220,
-      temperature: 0.4,
-    });
-
-    const reply =
-      completion.choices[0]?.message?.content ||
-      "No pude generar una respuesta. Intenta nuevamente.";
-
-    return res.status(200).json({
-      response: reply,
-    });
-  } catch (error) {
-    console.error("Error OpenAI:", error);
-
-    return res.status(500).json({
-      response:
-        "Ocurrió un error al procesar tu solicitud. Intenta de nuevo en unos momentos.",
-    });
-  }
+if (!apiKey) {
+  console.error("Falta OPENAI_API_KEY en las Environment Variables de Vercel");
 }
 
+export default {
+  async fetch(request) {
+    // Solo aceptar POST
+    if (request.method !== "POST") {
+      return new Response(
+        JSON.stringify({ error: "Método no permitido" }),
+        {
+          status: 405,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // Leer body
+    let body;
+    try {
+      body = await request.json();
+    } catch (e) {
+      return new Response(
+        JSON.stringify({
+          response: "No pude leer el mensaje. Intenta de nuevo.",
+        }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    const { message } = body || {};
+
+    if (!message || typeof message !== "string") {
+      return new Response(
+        JSON.stringify({
+          response: "Por favor escribe tu problema para poder ayudarte 🙂",
+        }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    if (!apiKey) {
+      return new Response(
+        JSON.stringify({
+          response:
+            "Hay un problema de configuración con la API. Avísale al administrador.",
+        }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    try {
+      // Llamada directa a OpenAI (chat completions)
+      const openaiRes = await fetch(
+        "https://api.openai.com/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${apiKey}`,
+          },
+          body: JSON.stringify({
+            model: "gpt-4.1-mini",
+            messages: [
+              {
+                role: "system",
+                content: `
+Eres TechSHPC, un técnico profesional especializado en PCs y laptops.
+Respondes de forma clara, práctica y amable.
+Usas lenguaje sencillo y frases cortas.
+Máximo 4–6 líneas por respuesta.
+Usas emojis con moderación y solo si ayudan 🙂
+No explicas de más si no te lo piden.
+Si falta información, preguntas solo lo necesario.
+                `.trim(),
+              },
+              {
+                role: "user",
+                content: message,
+              },
+            ],
+            max_tokens: 220,
+            temperature: 0.4,
+          }),
+        }
+      );
+
+      if (!openaiRes.ok) {
+        console.error("Error OpenAI status:", openaiRes.status);
+        const errorText = await openaiRes.text();
+        console.error("Detalle OpenAI:", errorText);
+
+        return new Response(
+          JSON.stringify({
+            response:
+              "Hubo un problema al generar la respuesta. Intenta de nuevo más tarde.",
+          }),
+          {
+            status: 500,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+      }
+
+      const data = await openaiRes.json();
+      const reply =
+        data.choices?.[0]?.message?.content ||
+        "No pude generar una respuesta. Intenta nuevamente.";
+
+      return new Response(
+        JSON.stringify({ response: reply }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    } catch (error) {
+      console.error("Error al llamar a OpenAI:", error);
+
+      return new Response(
+        JSON.stringify({
+          response:
+            "No pude conectar con el servicio de IA. Intenta de nuevo en unos minutos.",
+        }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+  },
+};
