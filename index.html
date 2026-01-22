@@ -11,17 +11,12 @@
 
   <style>
     :root {
-      --bg-main: #0A0A0A;
-      --bg-panel: #121212;
-      --bg-bubble-bot: #1E1E1E;
-      --bg-bubble-user: #2A2A2A;
-
-      --gold: #D6B46A;
-      --gold-soft: rgba(214, 180, 106, 0.55);
-
-      --text-main: #FFFFFF;
-      --text-muted: #B0B0B0;
-      --border-soft: rgba(255,255,255,0.08);
+      --gris-oscuro: #020617;
+      --gris-medio: #111827;
+      --gris-suave: #1f2933;
+      --dorado: #fbbf24;
+      --dorado-oscuro: #f59e0b;
+      --texto: #ffffff;
     }
 
     * {
@@ -32,23 +27,23 @@
 
     body {
       font-family: Inter, system-ui, sans-serif;
-      background: radial-gradient(circle at top, #1A1A1A 0%, #0A0A0A 60%, #000 100%);
+      background: radial-gradient(circle at top, #111827 0%, #020617 45%, #000 100%);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 20px;
-      color: var(--text-main);
+      color: var(--texto);
     }
 
     .chat-wrapper {
       width: 100%;
       max-width: 560px;
       height: 680px;
-      background: var(--bg-panel);
-      border-radius: 22px;
-      border: 1px solid var(--border-soft);
-      box-shadow: 0 25px 70px rgba(0,0,0,.9);
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: 20px;
+      border: 1px solid rgba(148,163,184,.35);
+      box-shadow: 0 20px 50px rgba(0,0,0,.7);
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -56,48 +51,85 @@
 
     .chat-header {
       padding: 16px 20px;
-      background: linear-gradient(180deg, #1A1A1A, #121212);
-      border-bottom: 1px solid var(--border-soft);
+      background: linear-gradient(90deg, #020617, #111827);
+      border-bottom: 1px solid rgba(148,163,184,.3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
 
     .chat-title {
       font-weight: 600;
       letter-spacing: .08em;
       text-transform: uppercase;
-      font-size: .95rem;
-      color: var(--gold);
+      font-size: .9rem;
     }
 
     .chat-subtitle {
       font-size: .75rem;
-      color: var(--text-muted);
-      opacity: .9;
+      color: #e5e7eb;
+      opacity: .85;
+    }
+
+    .chat-header-pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(248, 250, 252, 0.18);
+      font-size: .7rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #e5e7eb;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 8px rgba(34,197,94,.7);
     }
 
     .chat-body {
       flex: 1;
-      padding: 16px;
+      padding: 14px 14px 10px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
       gap: 10px;
-      background: linear-gradient(180deg, #0F0F0F 0%, #141414 100%);
+      background: var(--gris-oscuro);
     }
 
-    /* LOGO CENTRAL */
-    .chat-logo-center {
+    /* Bloque de logo dentro del chat */
+    .chat-logo-banner {
+      width: 100%;
       display: flex;
-      justify-content: center;
-      margin: 22px 0 14px;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 8px 6px;
+      margin-bottom: 4px;
     }
 
-    .chat-logo-center img {
-      width: 92px;
-      height: 92px;
+    .chat-logo-center {
+      width: 64px;
+      height: 64px;
       border-radius: 50%;
       object-fit: cover;
-      border: 2px solid var(--gold-soft);
-      box-shadow: 0 0 22px rgba(214, 180, 106, 0.25);
+      border: 2px solid rgba(251,191,36,0.9);
+      box-shadow: 0 0 15px rgba(251,191,36,0.45);
+    }
+
+    .chat-logo-text {
+      font-size: .8rem;
+      color: #9ca3af;
+      text-align: center;
     }
 
     .message-row {
@@ -114,29 +146,30 @@
     }
 
     .message-bubble {
-      max-width: 75%;
-      padding: 10px 14px;
+      max-width: 78%;
+      padding: 10px 12px;
       border-radius: 14px;
       font-size: .85rem;
-      line-height: 1.45;
+      line-height: 1.4;
       word-break: break-word;
     }
 
     .message-row.user .message-bubble {
-      background: linear-gradient(135deg, #303030, #242424);
+      background: var(--gris-suave);
       border-bottom-right-radius: 4px;
+      border: 1px solid rgba(148,163,184,.4);
     }
 
     .message-row.bot .message-bubble {
-      background: var(--bg-bubble-bot);
-      border: 1px solid var(--border-soft);
+      background: var(--gris-medio);
+      border: 1px solid rgba(148,163,184,.35);
       border-bottom-left-radius: 4px;
     }
 
     .chat-footer {
-      padding: 12px;
-      border-top: 1px solid var(--border-soft);
-      background: linear-gradient(180deg, #141414, #0F0F0F);
+      padding: 10px 12px 12px;
+      border-top: 1px solid rgba(148,163,184,.35);
+      background: rgba(15,23,42,.98);
     }
 
     .input-row {
@@ -146,38 +179,80 @@
 
     .chat-input {
       flex: 1;
-      padding: 10px 16px;
+      padding: 10px 14px;
       border-radius: 999px;
-      border: 1px solid rgba(214,180,106,0.25);
-      background: #0A0A0A;
-      color: var(--text-main);
+      border: 1px solid rgba(148,163,184,.6);
+      background: #020617;
+      color: var(--texto);
       font-size: .85rem;
       outline: none;
     }
 
     .chat-input::placeholder {
-      color: #7A7A7A;
-    }
-
-    .chat-input:focus {
-      border-color: var(--gold);
-      box-shadow: 0 0 0 2px rgba(214,180,106,0.2);
+      color: #6b7280;
     }
 
     .send-button {
-      padding: 10px 20px;
+      padding: 10px 18px;
       border-radius: 999px;
       border: none;
       cursor: pointer;
-      background: linear-gradient(135deg, #E6C87A, #C9A14A);
-      color: #1A1A1A;
+      background: linear-gradient(135deg, var(--dorado), var(--dorado-oscuro));
+      color: #111827;
       font-size: .85rem;
       font-weight: 600;
-      box-shadow: 0 6px 18px rgba(214,180,106,0.35);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 8px 25px rgba(251,191,36,0.40);
     }
 
     .send-button:hover {
       filter: brightness(1.05);
+      transform: translateY(-0.5px);
+    }
+
+    .send-icon {
+      font-size: 0.85rem;
+    }
+
+    /* Indicador “bot escribiendo…” */
+    .typing-bubble {
+      background: var(--gris-medio);
+      border: 1px solid rgba(148,163,184,.35);
+      border-radius: 14px;
+      padding: 8px 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      opacity: 0.4;
+      animation: blink 1s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(2) {
+      animation-delay: 0.15s;
+    }
+
+    .typing-dot:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    @keyframes blink {
+      0%, 100% {
+        opacity: 0.2;
+        transform: translateY(0);
+      }
+      50% {
+        opacity: 0.9;
+        transform: translateY(-2px);
+      }
     }
   </style>
 </head>
@@ -186,14 +261,26 @@
   <div class="chat-wrapper">
 
     <header class="chat-header">
-      <div class="chat-title">⚡ TechSHpc</div>
-      <div class="chat-subtitle">Asistente técnico para tu PC</div>
+      <div class="header-left">
+        <div class="chat-title">⚡ TechSHpc</div>
+        <div class="chat-subtitle">Asistente técnico para tu PC y laptop</div>
+      </div>
+      <div class="chat-header-pill">
+        <span class="status-dot"></span>
+        Responde en segundos
+      </div>
     </header>
 
     <main id="chat-body" class="chat-body">
-      <div class="chat-logo-center">
-        <img src="logo-techshpc.jpeg" alt="Logo TechSHpc">
+      <!-- Logo dentro del chat -->
+      <div class="chat-logo-banner">
+        <!-- Asegúrate de que este archivo exista en /www -->
+        <img src="logo-techshpc.jpeg" alt="Logo TechSHpc" class="chat-logo-center" />
+        <div class="chat-logo-text">
+          Describe tu problema, ej: "mi PC está lenta" o "mi laptop no enciende".
+        </div>
       </div>
+      <!-- Los mensajes se irán agregando aquí debajo -->
     </main>
 
     <footer class="chat-footer">
@@ -206,7 +293,7 @@
           autocomplete="off"
         />
         <button class="send-button" type="submit">
-          Enviar ➤
+          Enviar <span class="send-icon">➤</span>
         </button>
       </form>
     </footer>
@@ -218,19 +305,53 @@
     const input = document.getElementById("user-input");
     const chatBody = document.getElementById("chat-body");
 
+    let typingRow = null;
+
     function addMessage(text, from) {
       const row = document.createElement("div");
       row.className = "message-row " + from;
 
       const bubble = document.createElement("div");
       bubble.className = "message-bubble";
-
-      // Respetar saltos de línea del bot (1️⃣ uno debajo del otro)
-      bubble.innerHTML = text.replace(/\n/g, "<br>");
+      bubble.textContent = text;
 
       row.appendChild(bubble);
       chatBody.appendChild(row);
       chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function showTyping() {
+      hideTyping();
+
+      const row = document.createElement("div");
+      row.className = "message-row bot";
+
+      const bubble = document.createElement("div");
+      bubble.className = "typing-bubble";
+
+      const dot1 = document.createElement("span");
+      const dot2 = document.createElement("span");
+      const dot3 = document.createElement("span");
+      dot1.className = "typing-dot";
+      dot2.className = "typing-dot";
+      dot3.className = "typing-dot";
+
+      bubble.appendChild(dot1);
+      bubble.appendChild(dot2);
+      bubble.appendChild(dot3);
+
+      row.appendChild(bubble);
+      chatBody.appendChild(row);
+      chatBody.scrollTop = chatBody.scrollHeight;
+
+      typingRow = row;
+    }
+
+    function hideTyping() {
+      if (typingRow && typingRow.parentNode) {
+        typingRow.parentNode.removeChild(typingRow);
+      }
+      typingRow = null;
     }
 
     form.addEventListener("submit", async (e) => {
@@ -241,19 +362,30 @@
       addMessage(text, "user");
       input.value = "";
 
+      // Animación "bot escribiendo"
+      showTyping();
+
       try {
         const res = await fetch("https://webchat-mari.vercel.app/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: text })
+          body: JSON.stringify({ message: text }),
         });
 
         const data = await res.json();
+
+        hideTyping();
         addMessage(data.response || "Error al responder.", "bot");
-      } catch {
+      } catch (err) {
+        console.error(err);
+        hideTyping();
         addMessage("No se pudo conectar con el servidor.", "bot");
       }
     });
+  </script>
+</body>
+</html>
+
   </script>
 </body>
 </html>
