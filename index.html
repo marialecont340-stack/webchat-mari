@@ -11,22 +11,17 @@
 
   <style>
     :root {
-      /* GRISES */
       --bg-main: #0A0A0A;
       --bg-panel: #121212;
-      --bg-panel-soft: #1A1A1A;
       --bg-bubble-bot: #1E1E1E;
       --bg-bubble-user: #2A2A2A;
 
-      /* DORADO */
       --gold: #D6B46A;
       --gold-soft: rgba(214, 180, 106, 0.55);
 
-      /* TEXTO */
       --text-main: #FFFFFF;
       --text-muted: #B0B0B0;
-
-      --border-soft: rgba(255, 255, 255, 0.08);
+      --border-soft: rgba(255,255,255,0.08);
     }
 
     * {
@@ -129,7 +124,6 @@
 
     .message-row.user .message-bubble {
       background: linear-gradient(135deg, #303030, #242424);
-      color: #FFFFFF;
       border-bottom-right-radius: 4px;
     }
 
@@ -137,7 +131,6 @@
       background: var(--bg-bubble-bot);
       border: 1px solid var(--border-soft);
       border-bottom-left-radius: 4px;
-      color: var(--text-main);
     }
 
     .chat-footer {
@@ -155,7 +148,7 @@
       flex: 1;
       padding: 10px 16px;
       border-radius: 999px;
-      border: 1px solid rgba(214, 180, 106, 0.25);
+      border: 1px solid rgba(214,180,106,0.25);
       background: #0A0A0A;
       color: var(--text-main);
       font-size: .85rem;
@@ -168,7 +161,7 @@
 
     .chat-input:focus {
       border-color: var(--gold);
-      box-shadow: 0 0 0 2px rgba(214, 180, 106, 0.2);
+      box-shadow: 0 0 0 2px rgba(214,180,106,0.2);
     }
 
     .send-button {
@@ -180,10 +173,7 @@
       color: #1A1A1A;
       font-size: .85rem;
       font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 6px 18px rgba(214, 180, 106, 0.35);
+      box-shadow: 0 6px 18px rgba(214,180,106,0.35);
     }
 
     .send-button:hover {
@@ -234,7 +224,9 @@
 
       const bubble = document.createElement("div");
       bubble.className = "message-bubble";
-      bubble.textContent = text;
+
+      /* 👇 AQUÍ ESTÁ LA CORRECCIÓN CLAVE */
+      bubble.innerHTML = text.replace(/\n/g, "<br>");
 
       row.appendChild(bubble);
       chatBody.appendChild(row);
