@@ -53,6 +53,21 @@
       border-bottom: 1px solid rgba(148,163,184,.3);
     }
 
+    /* Contenedor logo + título */
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chat-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+    }
+
     .chat-title {
       font-weight: 600;
       letter-spacing: .05em;
@@ -153,7 +168,11 @@
       filter: brightness(1.05);
     }
 
-    /* 🔹 Indicador de “bot escribiendo” */
+    .send-icon {
+      font-size: 0.85rem;
+    }
+
+    /* Indicador “bot escribiendo…” */
     .typing-bubble {
       background: #111827;
       border: 1px solid rgba(148,163,184,.3);
@@ -176,6 +195,7 @@
     .typing-dot:nth-child(2) {
       animation-delay: 0.15s;
     }
+
     .typing-dot:nth-child(3) {
       animation-delay: 0.3s;
     }
@@ -197,8 +217,14 @@
   <div class="chat-wrapper">
 
     <header class="chat-header">
-      <div class="chat-title">TechSHpc</div>
-      <div class="chat-subtitle">Asistente técnico para tu PC</div>
+      <div class="header-left">
+        <!-- Asegúrate de que este archivo exista en el repo junto a index.html -->
+        <img src="logo-techshpc.jpeg" alt="Logo TechSHpc" class="chat-logo" />
+        <div>
+          <div class="chat-title">⚡ TechSHpc</div>
+          <div class="chat-subtitle">Asistente técnico para tu PC</div>
+        </div>
+      </div>
     </header>
 
     <!-- Chat vacío -->
@@ -214,7 +240,7 @@
           autocomplete="off"
         />
         <button class="send-button" type="submit">
-          Enviar ➤
+          Enviar <span class="send-icon">➤</span>
         </button>
       </form>
     </footer>
@@ -241,9 +267,7 @@
       chatBody.scrollTop = chatBody.scrollHeight;
     }
 
-    // 🔹 Mostrar animación de “bot escribiendo…”
     function showTyping() {
-      // por si quedara alguna anterior
       hideTyping();
 
       const row = document.createElement("div");
@@ -270,7 +294,6 @@
       typingRow = row;
     }
 
-    // 🔹 Ocultar animación
     function hideTyping() {
       if (typingRow && typingRow.parentNode) {
         typingRow.parentNode.removeChild(typingRow);
@@ -286,7 +309,6 @@
       addMessage(text, "user");
       input.value = "";
 
-      // mostrar animación de escritura
       showTyping();
 
       try {
@@ -298,7 +320,6 @@
 
         const data = await res.json();
 
-        // quitar animación y mostrar respuesta real
         hideTyping();
         addMessage(data.response || "Error al responder.", "bot");
       } catch (err) {
