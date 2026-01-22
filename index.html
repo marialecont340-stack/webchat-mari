@@ -14,6 +14,7 @@
       --morado-oscuro: #1F0A3C;
       --azul-casi-negro: #020617;
       --texto: #FFFFFF;
+      --dorado: rgba(218, 184, 115, 0.7);
     }
 
     * {
@@ -33,7 +34,6 @@
       color: var(--texto);
     }
 
-    /* CHAT MÁS GRANDE */
     .chat-wrapper {
       width: 100%;
       max-width: 560px;
@@ -51,21 +51,6 @@
       padding: 16px 20px;
       background: linear-gradient(90deg, var(--morado-oscuro), var(--azul-casi-negro));
       border-bottom: 1px solid rgba(148,163,184,.3);
-    }
-
-    /* Contenedor logo + título */
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .chat-logo {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 1px solid rgba(148, 163, 184, 0.6);
     }
 
     .chat-title {
@@ -89,6 +74,22 @@
       flex-direction: column;
       gap: 10px;
       background: var(--azul-casi-negro);
+    }
+
+    /* LOGO CENTRADO */
+    .chat-logo-center {
+      display: flex;
+      justify-content: center;
+      margin: 18px 0 10px;
+    }
+
+    .chat-logo-center img {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--dorado);
+      box-shadow: 0 0 18px rgba(218, 184, 115, 0.25);
     }
 
     .message-row {
@@ -167,49 +168,6 @@
     .send-button:hover {
       filter: brightness(1.05);
     }
-
-    .send-icon {
-      font-size: 0.85rem;
-    }
-
-    /* Indicador “bot escribiendo…” */
-    .typing-bubble {
-      background: #111827;
-      border: 1px solid rgba(148,163,184,.3);
-      border-radius: 14px;
-      padding: 8px 12px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .typing-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: #E5E7EB;
-      opacity: 0.4;
-      animation: blink 1s infinite ease-in-out;
-    }
-
-    .typing-dot:nth-child(2) {
-      animation-delay: 0.15s;
-    }
-
-    .typing-dot:nth-child(3) {
-      animation-delay: 0.3s;
-    }
-
-    @keyframes blink {
-      0%, 100% {
-        opacity: 0.2;
-        transform: translateY(0);
-      }
-      50% {
-        opacity: 0.9;
-        transform: translateY(-2px);
-      }
-    }
   </style>
 </head>
 
@@ -217,18 +175,18 @@
   <div class="chat-wrapper">
 
     <header class="chat-header">
-      <div class="header-left">
-        <!-- Asegúrate de que este archivo exista en el repo junto a index.html -->
-        <img src="logo-techshpc.jpeg" alt="Logo TechSHpc" class="chat-logo" />
-        <div>
-          <div class="chat-title">⚡ TechSHpc</div>
-          <div class="chat-subtitle">Asistente técnico para tu PC</div>
-        </div>
-      </div>
+      <div class="chat-title">⚡ TechSHpc</div>
+      <div class="chat-subtitle">Asistente técnico para tu PC</div>
     </header>
 
-    <!-- Chat vacío -->
-    <main id="chat-body" class="chat-body"></main>
+    <main id="chat-body" class="chat-body">
+
+      <!-- LOGO DENTRO DEL CHAT -->
+      <div class="chat-logo-center">
+        <img src="logo-techshpc.jpeg" alt="Logo TechSHpc">
+      </div>
+
+    </main>
 
     <footer class="chat-footer">
       <form id="chat-form" class="input-row">
@@ -240,7 +198,7 @@
           autocomplete="off"
         />
         <button class="send-button" type="submit">
-          Enviar <span class="send-icon">➤</span>
+          Enviar ➤
         </button>
       </form>
     </footer>
@@ -251,8 +209,6 @@
     const form = document.getElementById("chat-form");
     const input = document.getElementById("user-input");
     const chatBody = document.getElementById("chat-body");
-
-    let typingRow = null;
 
     function addMessage(text, from) {
       const row = document.createElement("div");
@@ -267,40 +223,6 @@
       chatBody.scrollTop = chatBody.scrollHeight;
     }
 
-    function showTyping() {
-      hideTyping();
-
-      const row = document.createElement("div");
-      row.className = "message-row bot";
-
-      const bubble = document.createElement("div");
-      bubble.className = "typing-bubble";
-
-      const dot1 = document.createElement("span");
-      const dot2 = document.createElement("span");
-      const dot3 = document.createElement("span");
-      dot1.className = "typing-dot";
-      dot2.className = "typing-dot";
-      dot3.className = "typing-dot";
-
-      bubble.appendChild(dot1);
-      bubble.appendChild(dot2);
-      bubble.appendChild(dot3);
-
-      row.appendChild(bubble);
-      chatBody.appendChild(row);
-      chatBody.scrollTop = chatBody.scrollHeight;
-
-      typingRow = row;
-    }
-
-    function hideTyping() {
-      if (typingRow && typingRow.parentNode) {
-        typingRow.parentNode.removeChild(typingRow);
-      }
-      typingRow = null;
-    }
-
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const text = input.value.trim();
@@ -308,8 +230,6 @@
 
       addMessage(text, "user");
       input.value = "";
-
-      showTyping();
 
       try {
         const res = await fetch("/api/chat", {
@@ -319,12 +239,8 @@
         });
 
         const data = await res.json();
-
-        hideTyping();
         addMessage(data.response || "Error al responder.", "bot");
-      } catch (err) {
-        console.error(err);
-        hideTyping();
+      } catch {
         addMessage("No se pudo conectar con el servidor.", "bot");
       }
     });
