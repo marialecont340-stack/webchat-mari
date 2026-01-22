@@ -225,7 +225,7 @@
       const bubble = document.createElement("div");
       bubble.className = "message-bubble";
 
-      /* 👇 AQUÍ ESTÁ LA CORRECCIÓN CLAVE */
+      // Respetar saltos de línea del bot (1️⃣ uno debajo del otro)
       bubble.innerHTML = text.replace(/\n/g, "<br>");
 
       row.appendChild(bubble);
@@ -242,7 +242,7 @@
       input.value = "";
 
       try {
-        const res = await fetch("/api/chat", {
+        const res = await fetch("https://webchat-mari.vercel.app/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: text })
@@ -257,3 +257,4 @@
   </script>
 </body>
 </html>
+
